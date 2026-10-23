@@ -1,0 +1,1 @@
+<footer><a class="brand" href="index.php"><span class="brand-icon">K</span> toko<span>kita</span></a><span>Belanja cerdas dimulai dari sini.</span><span>© <?=date('Y')?> TokoKita</span></footer>

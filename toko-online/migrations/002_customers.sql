@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS customers (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ name VARCHAR(120) NOT NULL,
+ email VARCHAR(190) NOT NULL UNIQUE,
+ phone VARCHAR(30) NOT NULL,
+ password_hash VARCHAR(255) NOT NULL,
+ active TINYINT(1) NOT NULL DEFAULT 1,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ last_login DATETIME NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS customer_addresses (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ customer_id BIGINT UNSIGNED NOT NULL,
+ label VARCHAR(60) NOT NULL DEFAULT 'Rumah',
+ recipient_name VARCHAR(120) NOT NULL,
+ phone VARCHAR(30) NOT NULL,
+ address TEXT NOT NULL,
+ city VARCHAR(100) NOT NULL,
+ postal_code VARCHAR(15) NOT NULL,
+ is_default TINYINT(1) NOT NULL DEFAULT 0,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ INDEX idx_customer_addresses_customer(customer_id,is_default),
+ CONSTRAINT fk_customer_addresses_customer FOREIGN KEY(customer_id) REFERENCES customers(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS customer_login_attempts (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ ip_address VARCHAR(45) NOT NULL,
+ email VARCHAR(190) NOT NULL,
+ succeeded TINYINT(1) NOT NULL DEFAULT 0,
+ attempted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ INDEX idx_customer_login_ip_time(ip_address,attempted_at,succeeded)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ALTER TABLE orders ADD COLUMN customer_id BIGINT UNSIGNED NULL AFTER order_number;
+ALTER TABLE orders ADD INDEX idx_orders_customer(customer_id);
+ALTER TABLE orders ADD CONSTRAINT fk_orders_customer FOREIGN KEY(customer_id) REFERENCES customers(id) ON DELETE SET NULL;
